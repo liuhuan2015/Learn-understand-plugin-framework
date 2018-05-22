@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 /**
  * Date: 2018/5/22 09:07
- * Description:
+ * Description:静态代理的测试类
  */
 
 public class Test {
