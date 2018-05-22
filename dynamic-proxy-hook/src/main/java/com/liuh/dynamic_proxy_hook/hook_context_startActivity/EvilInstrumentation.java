@@ -39,6 +39,9 @@ public class EvilInstrumentation extends Instrumentation {
                 "\ntarget = [" + target + "], \nintent = [" + intent +
                 "], \nrequestCode = [" + requestCode + "], \noptions = [" + options + "]");
 
+        //开始调用原始的方法，调不调用随你，但是不调用的话，所有的startActivity都会失效，
+        //由于这个方法是隐藏的，因此需要使用反射调用；首先找到这个方法
+
         try {
             Method execStartActivityMethod = Instrumentation.class.getDeclaredMethod("execStartActivity",
                     Context.class,
@@ -61,6 +64,7 @@ public class EvilInstrumentation extends Instrumentation {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (Exception e) {
+            //有的rom可能做了修改，需要自己进行适配
             throw new RuntimeException("do not support ! please adapter it");
         }
         return null;

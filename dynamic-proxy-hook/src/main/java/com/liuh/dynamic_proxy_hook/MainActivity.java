@@ -1,11 +1,14 @@
 package com.liuh.dynamic_proxy_hook;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.liuh.dynamic_proxy_hook.hook_context_startActivity.HookHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +31,16 @@ public class MainActivity extends AppCompatActivity {
                 getApplicationContext().startActivity(intent);
             }
         });
+    }
 
+    //在Activity的attach(...)方法中会调用attachBaseContext方法，所以它会执行在onCreate(...)之前
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+        try {
+            HookHelper.attachContext();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
