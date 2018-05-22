@@ -26,6 +26,7 @@ public class Test {
         //使用动态代理去购物
         System.out.println("-----------使用动态代理去购物-----开始---------");
         //TODO 下面的写法感觉有点看不懂，传进去的参数都和women有关，最终把返回值又赋给了women
+        //动态代理，动态实现，多态
         women = (IShopping) Proxy.newProxyInstance(women.getClass().getClassLoader(),
                 women.getClass().getInterfaces(), new ShoppingHandler(women));
         System.out.println("代理帮我买到了：" + Arrays.toString(women.doShopping(100)));
