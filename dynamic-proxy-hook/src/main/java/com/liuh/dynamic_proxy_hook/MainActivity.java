@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.liuh.dynamic_proxy_hook.hook_context_startActivity.HookHelper;
+import com.liuh.dynamic_proxy_hook.hook_activity_startActivity.HookHelper_Activity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_dynamic_proxy_hook);
 
+        HookHelper_Activity.attachContext(this);
+
         btn_test = findViewById(R.id.btn_test);
         btn_test.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -28,7 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setData(Uri.parse("http://www.baidu.com"));
 
-                getApplicationContext().startActivity(intent);
+//                getApplicationContext().startActivity(intent);
+                startActivity(intent);
             }
         });
     }
@@ -38,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(newBase);
         try {
-            HookHelper.attachContext();
+//            HookHelper.attachContext();
         } catch (Exception e) {
             e.printStackTrace();
         }
