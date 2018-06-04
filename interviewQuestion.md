@@ -20,3 +20,24 @@ public Object getProxyInstance() {
             });
 }
 ```
+代理可以理解为我们没有时间亲自去买东西，于是我们找了一个代购帮我们去买。<br>
+传统的静态代理模式需要为每一个被代理的类写一个代理类，即顾客和代理商是一对一的关系。在这种情况下，如果需要被代理的类有很多时，使用静态代理就不合适了。<br>
+动态代理模式可以简单理解为JVM可以在运行时帮我们动态生成一系列的代理类,这样我们就不需要手动写每一个静态的代理类了.动态代理主要涉及到两个类：<br>
+1、Proxy <br>
+该类即为动态代理类，<br>
+static Object newProxyInstance(ClassLoader loader, Class[] interfaces, InvocationHandler h)，<br>
+返回代理类的一个实例，返回后的代理类可以当作被代理类使用<br>
+loader 类加载器<br>
+interfaces 实现接口<br>
+2、java.lang.reflect.InvocationHandler<br>
+该接口中仅定义了一个方法：public Object invoke(Object obj, Method method, Object[] args)，<br>
+在使用时，第一个参数obj一般是指被代理的对象，method是被代理的方法，args为该方法的参数数组。<br>
+这个抽象方法在代理类中动态实现。<br>
+
+JDK动态代理的一般实现步骤如下：<br>
+（1）创建一个实现InvocationHandler接口的类，它必须实现invoke方法<br>
+（2）创建被代理的类以及接口<br>
+（3）调用Proxy的静态方法newProxyInstance，创建一个代理类<br>
+（4）通过代理调用方法<br>
+具体使用可以见[Learn-understand-plugin-framework](https://github.com/liuhuan2015/Learn-understand-plugin-framework)
+
