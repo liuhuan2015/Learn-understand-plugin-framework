@@ -42,6 +42,10 @@ JDK动态代理的一般实现步骤如下：<br>
 具体使用可以见[Learn-understand-plugin-framework](https://github.com/liuhuan2015/Learn-understand-plugin-framework)
 
 #### 2.ActivityManager，ActivityManagerService以及ActivityManagerNative之间的关系
-翻阅系统的ActivityManagerServer的源码，我们就会知道哪一个类是什么角色了：IActivityManager是一个IInterface，它代表远程Service具有什么能力，ActivityManagerNative指的是Binder本地对象（类似AIDL工具生成的Stub类），这个类是抽象类，它的实现是ActivityManagerService；因此对于AMS的最终操作都会进入ActivityManagerService这个真正实现；同时如果仔细观察，ActivityManagerNative.java里面有一个非公开类ActivityManagerProxy, 它代表的就是Binder代理对象；是不是跟AIDL模型一模一样呢？那么ActivityManager是什么？他不过是一个管理类而已，可以看到真正的操作都是转发给ActivityManagerNative进而交给他的实现ActivityManagerService 完成的。<br>
+翻阅系统的ActivityManagerServer的源码，我们就会知道哪一个类是什么角色了：<br>
+IActivityManager是一个IInterface，它代表远程Service具有什么能力，<br>
+ActivityManagerNative指的是Binder本地对象（类似AIDL工具生成的Stub类），这个类是抽象类，它的实现是ActivityManagerService；因此对于AMS的最终操作都会进入ActivityManagerService这个真正实现；<br>
+同时如果仔细观察，ActivityManagerNative.java里面有一个非公开类ActivityManagerProxy, 它代表的就是Binder代理对象；这个和AIDL模型是一模一样的。<br>
+ActivityManager呢？它是一个管理类，真正的操作都是转发给ActivityManagerNative进而交给他的实现ActivityManagerService 完成的。<br>
 详见[Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer/)
 
