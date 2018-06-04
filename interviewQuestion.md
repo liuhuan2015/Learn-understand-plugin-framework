@@ -47,5 +47,7 @@ IActivityManager是一个IInterface，它代表远程Service具有什么能力�
 ActivityManagerNative指的是Binder本地对象（类似AIDL工具生成的Stub类），这个类是抽象类，它的实现是ActivityManagerService；因此对于AMS的最终操作都会进入ActivityManagerService这个真正实现；<br>
 同时如果仔细观察，ActivityManagerNative.java里面有一个非公开类ActivityManagerProxy, 它代表的就是Binder代理对象；这个和AIDL模型是一模一样的。<br>
 ActivityManager呢？它是一个管理类，真正的操作都是转发给ActivityManagerNative进而交给他的实现ActivityManagerService 完成的。<br>
+ActivityManagerNative实际上就是ActivityManagerService这个远程对象的Binder代理对象；每次需要与AMS打交道的时候，需要借助这个代理对象通过Binder驱动进而完成IPC调用<br>
+由于整个Framework与AMS打交道是如此频繁，framework使用了一个单例把这个AMS的代理对象保存了起来；这样只要需要与AMS进行IPC调用，获取这个单例即可。这是AMS这个系统服务与其他普通服务的不同之处<br>
 详见[Binder学习指南](http://weishu.me/2016/01/12/binder-index-for-newer/)
 
