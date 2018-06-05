@@ -51,7 +51,7 @@
 （3）调用Proxy的静态方法newProxyInstance，创建一个代理类<br>
 （4）通过代理调用方法<br>
  
-#### 二．Hook机制之Binder Hook
+#### 二 . Hook机制之Binder Hook
 详见[Android插件化原理解析——Hook机制之Binder Hook](http://weishu.me/2016/02/16/understand-plugin-framework-binder-hook/)<br>
 下面这些话都是摘抄的原作者的。<br>
 android系统通过Binder机制给应用程序提供了一系列的系统服务，比如ActivityManagerService,ClipboardManager,AudioManager等；这些广泛存在的系统服务
@@ -67,7 +67,7 @@ android系统通过Binder机制给应用程序提供了一系列的系统服务�
 然后文章给我们演示了如何Hook系统的剪贴板服务。<br>
 插件框架当然不会做替换文本这么无聊的事情，DroidPlugin插件框架管理插件使得插件就像是主程序一样，因此插件需要使用主程序的剪切版，插件之间也会共用剪切版；其他的一些系统服务也类似，这样就可以达到插件和宿主程序之间的天衣服缝，水乳交融。 
 
-#### 三.Hook机制之ams&pms
+#### 三 . Hook机制之ams&pms
 详见[Android 插件化原理解析——Hook机制之AMS&PMS](http://weishu.me/2016/03/07/understand-plugin-framework-ams-pms-hook/)<br>
 Hook并不是一项神秘的技术；一个干净，透明的框架少不了AOP，而AOP也少不了Hook.
 作者所讲解的Hook仅仅使用反射和动态代理技术，更加强大的Hook机制可以进行字节码编织，比如J2EE广泛使用了cglib和asm进行AOP编程；而Android上现有的插件框架还是加载编译时代码，采用动态生成类的技术理论上也是可行的。
