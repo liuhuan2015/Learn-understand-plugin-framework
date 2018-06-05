@@ -15,13 +15,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.btn_hook_ams).setOnClickListener(this);
-
+        findViewById(R.id.btn_hook_pms).setOnClickListener(this);
     }
 
     //这个方法比onCreate调用的早；在这里hook比较好
     @Override
     protected void attachBaseContext(Context newBase) {
         HookHelper.hookActivityManager();
+        HookHelper.hookPackageManager(newBase);
         super.attachBaseContext(newBase);
     }
 
@@ -34,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent it = new Intent(Intent.ACTION_VIEW);
                 it.setData(uri);
                 startActivity(it);
+                break;
+            case R.id.btn_hook_pms:
+                //测试PMS hook（调用其相关方法）
+                getPackageManager().getInstalledApplications(0);
                 break;
         }
     }

@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.setData(Uri.parse("http://www.baidu.com"));
 
-//                getApplicationContext().startActivity(intent);
-                startActivity(intent);
+                getApplicationContext().startActivity(intent);
+//                startActivity(intent);
             }
         });
     }
