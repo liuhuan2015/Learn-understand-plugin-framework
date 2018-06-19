@@ -53,7 +53,7 @@ public class IActivityManagerHandler implements InvocationHandler {
             //替换掉Intent，达到欺骗的目的
             args[index] = newIntent;
 
-            Log.d(TAG, "hook success");
+            Log.e(TAG, "hook success");
             return method.invoke(mBase, args);
         }
 

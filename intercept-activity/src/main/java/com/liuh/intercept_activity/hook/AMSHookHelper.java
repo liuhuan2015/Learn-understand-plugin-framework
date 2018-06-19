@@ -48,6 +48,13 @@ public class AMSHookHelper {
         mInstanceField.set(gDefault, proxy);
     }
 
+    /**
+     * 由于之前我们用替身欺骗了AMS,现在我们要换回我们真正需要启动的Activity，不然就真的是启动替身了
+     *
+     * 到最终要启动Activity的时候，会交给ActivityThread的一个内部类叫做H来完成，
+     * H会完成这个消息转发，最终调用它的callback
+     * @throws Exception
+     */
     public static void hookActivityThreadHandler() throws Exception {
         //先获取到当前的ActivityThread对象
         Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");

@@ -36,6 +36,7 @@ public class ActivityThreadHandlerCallback implements Handler.Callback {
     private void handleLaunchActivity(Message msg) {
         //这里为了简单起见，直接取出TargetActivity
         Object obj = msg.obj;
+        Log.e("------", "类型：" + obj.getClass().getSimpleName());
 
         try {
             //把替身恢复成真身
@@ -44,6 +45,7 @@ public class ActivityThreadHandlerCallback implements Handler.Callback {
             Intent raw = (Intent) intent.get(obj);
 
             Intent target = raw.getParcelableExtra(AMSHookHelper.EXTRA_TARGET_INTENT);
+            Log.e("^^^^^^^^^^", "target.getComponent() : " + target.getComponent());
             raw.setComponent(target.getComponent());
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
