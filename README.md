@@ -87,8 +87,8 @@ AOP（Aspect Oriented Programming）编程，即面向切面编程。<br>
 App进程与AMS进程的通讯过程如下图：
 ![App和AMS交互流程](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/images/App_with_AMS.png)<br>
 
- 1.App进程会委托AMS进程完成Activity生命周期的管理以及任务栈的管理；这个通信过程中AMS是Server端，App进程通过持有AMS的client代理ActivityManagerNative完成通信过程。<br>
- 2.AMS进程完成生命周期管理以及任务栈管理后，会把控制权交给App进程，让App进程完成Activity类对象的创建，以及生命周期回调；这个通信过程也是通过Binder完成的，App所在server端的Binder对象存在于ActivityThread的内部类ApplicationThread;AMS所在client通过持有IApplicationThread的代理对象完成和App进程的通信。<br>
+ 1 . App进程会委托AMS进程完成Activity生命周期的管理以及任务栈的管理；这个通信过程中AMS是Server端，App进程通过持有AMS的client代理ActivityManagerNative完成通信过程。<br>
+ 2 . AMS进程完成生命周期管理以及任务栈管理后，会把控制权交给App进程，让App进程完成Activity类对象的创建，以及生命周期回调；这个通信过程也是通过Binder完成的，App所在server端的Binder对象存在于ActivityThread的内部类ApplicationThread;AMS所在client通过持有IApplicationThread的代理对象完成和App进程的通信。<br>
  
 Activity的启动过程用一张图简单描述如下：
 ![Activity简要启动流程](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/images/Activity_launch.png)<br>
