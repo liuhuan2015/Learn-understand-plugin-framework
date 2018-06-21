@@ -97,7 +97,13 @@ Activity的启动过程用一张图简单描述如下：
 
 为了绕过“必须在AndroidManifest.xml中显式声明使用的Activity”的限制，可以在第一步假装启动一个已经在AndroidManifest.xml里面声明过的替身Activity，让这个Activity进入AMS进程接受校验；最后在第三步的时候换成我们真正要启动的Activity；这样就成功的欺骗了AMS进程。<br>
 
-具体实现见原文和工程代码（使用的是Hook技术）
+具体实现见原文和工程代码（使用的是Hook技术）。<br>
+
+在实际的插件系统中，要启动的目标Activity肯定存在于一个单独的文件中，系统默认的ClassLoader无法加载插件中的Activity类————系统压根儿就不知道要加载的插件在哪里，谈何加载。这是一个很重要的问题需要处理。<br>
+
+我们要完成插件系统中类的加载，可以通过自定义ClassLoader来实现。解决了“启动没有在AndroidManifest中显式声明的，并且存在于外部文件中的Activity”的问题，插件系统对于Activity的管理才算得上是一个完全体。（这个见后续文章）<br>
+
+
 
 
  
