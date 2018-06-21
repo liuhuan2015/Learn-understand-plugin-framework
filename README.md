@@ -72,6 +72,32 @@ android系统通过Binder机制给应用程序提供了一系列的系统服务�
 Hook并不是一项神秘的技术；一个干净，透明的框架少不了AOP，而AOP也少不了Hook.<br>
 作者所讲解的Hook仅仅使用反射和动态代理技术，更加强大的Hook机制可以进行字节码编织，比如J2EE广泛使用了cglib和asm进行AOP编程；而Android上现有的插件框架还是加载编译时代码，采用动态生成类的技术理论上也是可行的。<br>
 AOP（Aspect Oriented Programming）编程，即面向切面编程。<br>
+
+#### 四 . Activity生命周期管理
+在Java平台上要做到动态运行模块、热插拔可以使用ClassLoader技术进行动态类加载，比如广泛使用的OSGI技术。在Android上当然也可以使用动态加载技术，但是仅仅完成动态类加载是不够的，我们需要想办法把我们加载进来的Activity等组件交给系统管理，让AMS赋予组件声明周期。这样才算是一个有血有肉的完善的插件化方案。<br>
+##### AndroidManifest.xml的限制
+在Android中有一个限制：必须在AndroidManifest.xml中显式声明使用的Activity。如果不声明，那么在程序运行的时候，一般会遇到如下异常：
+``` java
+06-21 09:19:13.268 4462-4462/com.liuh.intercept_activity E/AndroidRuntime: FATAL EXCEPTION: main
+                                                                           Process: com.liuh.intercept_activity, PID: 4462
+                                                                           android.content.ActivityNotFoundException: Unable to find explicit activity class {com.liuh.intercept_activity/com.liuh.intercept_activity.TargetActivity}; have you declared this activity in your AndroidManifest.xml?
+```
+这个限制在很大程度上限制了插件系统的发挥：假设我们需要启动一个插件的Activity，插件使用的Activity是无法预知的，这样肯定不会在AndroidManifest.xml文件中声明；如果插件中新添加了一个Activity，主程序的AndroidManifest.xml就需要更新；既然双方都需要升级，何必使用插件呢？这已经违背了动态加载的初衷：不修改插件框架而动态扩展功能。
+##### 如何绕过“必须在AndroidManifest.xml中显式声明使用的Activity”的限制
+App进程与AMS进程的通讯过程如下图：
+![App和AMS交互流程](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/images/App_with_AMS.png)<br>
+
+ 1.App进程会委托AMS进程完成Activity生命周期的管理以及任务栈的管理；这个通信过程中AMS是Server端，App进程通过持有AMS的client代理ActivityManagerNative完成通信过程。<br>
+ 2.AMS进程完成生命周期管理以及任务栈管理后，会把控制权交给App进程，让App进程完成Activity类对象的创建，以及生命周期回调；这个通信过程也是通过Binder完成的，App所在server端的Binder对象存在于ActivityThread的内部类ApplicationThread;AMS所在client通过持有IApplicationThread的代理对象完成和App进程的通信。<br>
  
- 
+Activity的启动过程用一张图简单描述如下：
+![Activity简要启动流程](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/images/Activity_launch.png)<br>
+
+先从App进程调用startActivity；然后通过IPC调用进入系统进程system_server，完成Activity管理以及一些校验工作；最后又回到了APP进程完成真正的Activity对象创建。<br>
+
+为了绕过“必须在AndroidManifest.xml中显式声明使用的Activity”的限制，可以在第一步假装启动一个已经在AndroidManifest.xml里面声明过的替身Activity，让这个Activity进入AMS进程接受校验；最后在第三步的时候换成我们真正要启动的Activity；这样就成功的欺骗了AMS进程。<br>
+
+具体实现见原文和工程代码（使用的是Hook技术）
+
+
  
