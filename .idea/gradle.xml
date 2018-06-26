@@ -11,6 +11,7 @@
             <option value="$PROJECT_DIR$/ams-pms-hook" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/binder-hook" />
+            <option value="$PROJECT_DIR$/classloader-hook" />
             <option value="$PROJECT_DIR$/dynamic-proxy-hook" />
             <option value="$PROJECT_DIR$/intercept-activity" />
           </set>

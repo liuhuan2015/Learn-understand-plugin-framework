@@ -17,12 +17,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_dynamic_proxy_hook);
+//        setContentView(R.layout.activity_main_dynamic_proxy_hook);
+        Button tv = new Button(this);
+        tv.setText("测试界面");
+
+        setContentView(tv);
 
         HookHelper_Activity.attachContext(this);
 
-        btn_test = findViewById(R.id.btn_test);
-        btn_test.setOnClickListener(new View.OnClickListener() {
+//        btn_test = findViewById(R.id.btn_test);
+
+        tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
