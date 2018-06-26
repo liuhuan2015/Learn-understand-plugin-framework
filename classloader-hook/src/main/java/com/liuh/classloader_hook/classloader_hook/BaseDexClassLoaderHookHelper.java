@@ -46,7 +46,8 @@ public final class BaseDexClassLoaderHookHelper {
 
         //构造插件Element(File file,boolean isDirectory,File zip,DexFile dexFile)
         Constructor<?> constructor = elementClass.getConstructor(File.class, boolean.class, File.class, DexFile.class);
-        Object o = constructor.newInstance(apkFile, false, apkFile, DexFile.loadDex(apkFile.getCanonicalPath(), optDexFile.getAbsolutePath(), 0));
+        Object o = constructor.newInstance(apkFile, false, apkFile, DexFile.loadDex(apkFile.getCanonicalPath(),
+                optDexFile.getAbsolutePath(), 0));
 
         Object[] toAddElementArray = new Object[]{o};
         //把原始的elements复制进去

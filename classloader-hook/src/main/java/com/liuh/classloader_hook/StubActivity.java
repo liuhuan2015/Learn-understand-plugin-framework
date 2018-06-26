@@ -1,9 +1,9 @@
 package com.liuh.classloader_hook;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 
-public class StubActivity extends AppCompatActivity {
+public class StubActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
