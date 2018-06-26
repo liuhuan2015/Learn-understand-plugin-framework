@@ -67,6 +67,13 @@ public class Utils {
         return enforceDirExists(new File(getPluginBaseDir(packageName), "odex"));
     }
 
+    /**
+     * 插件得lib库路径, 这个demo里面没有用
+     */
+    public static File getPluginLibDir(String packageName) {
+        return enforceDirExists(new File(getPluginBaseDir(packageName), "lib"));
+    }
+
     private static File sBaseDir;
 
     //需要加载的插件的基本目录 /data/data/<package>/files/plugin/

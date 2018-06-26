@@ -11,6 +11,7 @@ import android.widget.Button;
 
 import com.liuh.classloader_hook.ams_hook.AMSHookHelper;
 import com.liuh.classloader_hook.classloader_hook.BaseDexClassLoaderHookHelper;
+import com.liuh.classloader_hook.classloader_hook.LoadedApkClassLoaderHookHelper;
 
 import java.io.File;
 
@@ -33,7 +34,7 @@ public class MainActivity extends Activity {
 
     private static final int CUSTOM_CLASS_LOADER = 2;//自定义ClassLoader（激进方案）
 
-    private static final int HOOK_METHOD = PATCH_BASE_CLASS_LOADER;
+    private static final int HOOK_METHOD = CUSTOM_CLASS_LOADER;
 
 
     @Override
@@ -55,7 +56,7 @@ public class MainActivity extends Activity {
                     intent.setComponent(new ComponentName("com.liuh.dynamic_proxy_hook",
                             "com.liuh.dynamic_proxy_hook.MainActivity"));
                 } else {
-                    intent.setComponent(new ComponentName("", ""));
+                    intent.setComponent(new ComponentName("com.liuh.ams_pms_hook", "com.liuh.ams_pms_hook.MainActivity"));
                 }
                 startActivity(intent);
             }
@@ -68,7 +69,7 @@ public class MainActivity extends Activity {
 
         try {
             Utils.extractAssets(newBase, "dynamic-proxy-hook.apk");//把Assets里面的文件复制到/data/data/<package>/files目录下
-//            Utils.extractAssets(newBase, "ams-pms-hook.apk");
+            Utils.extractAssets(newBase, "ams-pms-hook.apk");
 //            Utils.extractAssets(newBase, "test.apk");
 
             if (HOOK_METHOD == PATCH_BASE_CLASS_LOADER) {
@@ -76,7 +77,7 @@ public class MainActivity extends Activity {
                 File optDexFile = getFileStreamPath("dynamic-proxy-hook.dex");
                 BaseDexClassLoaderHookHelper.patchClassLoader(getClassLoader(), dexFile, optDexFile);//把文件添加进系统classloader的pathList的dexElements数组中
             } else {
-                //            LoadedApkClassLoaderHookHelper.hookLoadedApkInActivityThread(getFileStreamPath("ams-pms-hook.apk"));
+                LoadedApkClassLoaderHookHelper.hookLoadedApkInActivityThread(getFileStreamPath("ams-pms-hook.apk"));
             }
             AMSHookHelper.hookActivityManagerNative();
             AMSHookHelper.hookActivityThreadHandler();

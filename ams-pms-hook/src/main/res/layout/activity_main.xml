@@ -7,7 +7,6 @@
     android:orientation="vertical"
     tools:context="com.liuh.ams_pms_hook.MainActivity">
 
-
     <Button
         android:id="@+id/btn_hook_ams"
         android:layout_width="match_parent"
