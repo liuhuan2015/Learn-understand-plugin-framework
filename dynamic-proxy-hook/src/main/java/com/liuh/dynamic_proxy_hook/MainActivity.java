@@ -1,5 +1,6 @@
 package com.liuh.dynamic_proxy_hook;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -10,7 +11,7 @@ import android.widget.Button;
 
 import com.liuh.dynamic_proxy_hook.hook_activity_startActivity.HookHelper_Activity;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     Button btn_test;
 

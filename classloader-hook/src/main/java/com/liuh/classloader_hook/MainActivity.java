@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
 
     private static final int CUSTOM_CLASS_LOADER = 2;//自定义ClassLoader（激进方案）
 
-    private static final int HOOK_METHOD = CUSTOM_CLASS_LOADER;
+    private static final int HOOK_METHOD = PATCH_BASE_CLASS_LOADER;
 
 
     @Override
