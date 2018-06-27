@@ -107,7 +107,7 @@ Activity的启动过程用一张图简单描述如下：
 通常情况下，插件均是以独立的文件存在甚至是通过网络获取的，这时我们怎么才能从宿主程序中启动插件中的Activity呢？<br>
 问题：如何启动没有在AndroidManifest.xml中显式声明，并且存在于外部插件中的Activity。<br>
 
-##### ClassLoader机制
+##### 1 . ClassLoader机制
 Java虚拟机把描述类的数据从Class文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的Java类型，这就是虚拟机的类加载机制。<br>
 
 Java的类加载机制是一个相对复杂的过程；它包括加载、验证、准备、解析、初始化五个阶段；对于开发者来说，可控性最强的是加载阶段；加载阶段主要完成三件事情：<br>
@@ -121,17 +121,17 @@ Android Framework提供了DexClassLoader这个类，简化了『通过一个类�
 
 **将插件的dex或者apk文件告诉『合适的』DexClassLoader，借助它完成插件类的加载**
 
-##### 激进方案：Hook掉系统的ClassLoader，自己操刀
+##### 2 . 激进方案：Hook掉系统的ClassLoader，自己操刀
 最终目的是调用getPackageInfoNoCheck得到LoadedApk的信息，并替换其中的mClassLoader然后把其添加到ActivityThread的mPackages缓存中；从而达到我们使用自己的ClassLoader加载插件中的类的目的<br>
 LoadedApk对象是APK文件在内存中的表示。 Apk文件的相关信息，诸如Apk文件的代码和资源，甚至代码里面的Activity，Service等组件的信息我们都可以通过此对象获取<br>
 在这种方案中，全盘接管了插件中类的加载过程，使用了一个自定义的ClassLoader，是一种相对暴力的解决方案。
 
-##### 保守方案：委托系统，让系统帮忙加载
+##### 3 . 保守方案：委托系统，让系统帮忙加载
 原理：<br>
 1 . 默认情况下performLacunchActivity会使用替身StubActivity的ApplicationInfo也就是宿主程序的CLassLoader加载所有的类；我们的思路是告诉宿主ClassLoader我们在哪，让其帮助完成类加载的过程。<br>
 2 . 宿主程序的ClassLoader最终继承自BaseDexClassLoader，BaseDexClassLoader通过DexPathList进行类的查找过程；而这个查找通过遍历一个dexElements的数组完成；我们通过把插件dex添加进这个数组就让宿主ClasLoader获取了加载插件类的能力。<br>
 
-##### 两种方案的总结
+##### 4 . 两种方案的总结
 1 . 『激进方案』中我们自定义了插件的ClassLoader，并且绕开了Framework的检测；利用ActivityThread对于LoadedApk的缓存机制，我们把携带这个自定义的ClassLoader的插件信息添加进mPackages中，进而完成了类的加载过程<br>
 2 . 『保守方案』中我们深入探究了系统使用ClassLoader findClass的过程，发现应用程序使用的非系统类都是通过同一个PathClassLoader加载的；而这个类的最终父类BaseDexClassLoader通过DexPathList完成类的查找过程；我们hack了这个查找过程，从而完成了插件类的加载<br>
 
