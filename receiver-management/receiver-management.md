@@ -88,6 +88,40 @@ AMS类的registerReceiver方法代码有点多，主要做了以下两件事：<
  往后的源码分析过程不抄了。
  
  #### 三 . 思路分析——怎么才能实现对BroadcastReceiver的插件化？
+ 从前面的源码分析我们发现：Framework对于静态广播和动态广播的处理是不同的；不过，这个不同仅仅体现在注册过程——静态广播需要在清单文件中注册，并且注册的信息存储在PMS中;<br>
+ 动态广播则不需要在清单文件中注册，而是使用的代码进行注册，注册的信息存储在AMS中。<br>
+ 
+ 动态注册BroadcastReceiver的插件化看起来比较容易一点。<br>
+ 
+ 首先，广播并没有复杂的生命周期，它的整个存活过程其实就是一个onReceive的回调；而动态广播又不需要在清单文件中预先注册，所以动态注册的BroadcastReceiver其实可以当做一个普通的Java对象；<br>
+ 我们完全可以用纯ClassLoader技术实现它——把插件中的Receiver加载进来，然后想办法让它接收onReceive的回调。<br>
+ 
+ 静态注册BroadcastReceiver的插件化看起来要复杂一些。<br>
+ 主要是在静态BroadcastReceiver中这个IntentFilter我们事先无法确定，它是动态变化的；但是，动态BroadcastReceiver不是可以动态添加IntengFilter吗？<br>
+ 
+ **可以把静态广播当做动态广播处理**
+ 
+ 既然都是广播，它们的功能都是订阅一个特定的消息然后执行某个特定的操作，我们完全可以把插件中的静态广播全部注册为动态广播，这样就解决了静态广播的问题。<br>
+ 当然，这样是有缺陷的，静态广播和动态广播的一个非常大的不同之处是：<br>
+ 动态广播在进程死亡之后是无法接收广播的，而静态广播则可以——系统会唤醒Receiver所在进程。<br>
+ 
+ ##### 静态广播非静态的实现
+ 
+ **解析**
+ 要把插件中的静态BroadcastReceiver当做动态BroadcastReceiver处理，首先要知道插件中到底注册了哪些广播，可以选择手动解析插件的清单文件，也可以选择使用系统的PackageParser来帮助解析。<br>
+ PackageParser中有一系列方法用来提取apk中的信息，我们要解析apk的<receiver>的信息，可以使用PackageParser的generateActivityInfo方法。
+ 
+ **注册**
+ 当我们解析得到插件中静态注册的BroadcastReceiver的信息后，我们只需要把这些静态广播动态注册一遍就可以了；但是，由于BroadcastReceiver的实现类存在于插件之中，我们需要手动用ClassLoader来加载它。<br>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
  
  
