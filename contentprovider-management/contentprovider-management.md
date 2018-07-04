@@ -1,5 +1,5 @@
 #### 一 . 前言
-相对于实现Activity的插件化，BroadcastReceiver的插件化实现要简单很多————BroadcastReceiver的生命周期相当简单。<br>
+相对于实现Activity的插件化，BroadcastReceiver的插件化实现要简单很多——BroadcastReceiver的生命周期相当简单。<br>
 
 我们平时使用BroadcastReceiver的操作包含：注册，发送，接收；因此，要实现BroadcastReceiver的插件化就这三种操作提供支持。<br>
 
@@ -87,7 +87,7 @@ AMS类的registerReceiver方法代码有点多，主要做了以下两件事：<
  
  往后的源码分析过程不抄了。
  
- #### 三 . 思路分析————怎么才能实现对BroadcastReceiver的插件化？
+ #### 三 . 思路分析——怎么才能实现对BroadcastReceiver的插件化？
  
  
  
