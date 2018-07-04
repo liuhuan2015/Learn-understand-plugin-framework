@@ -107,12 +107,21 @@ AMS类的registerReceiver方法代码有点多，主要做了以下两件事：<
  
  ##### 静态广播非静态的实现
  
- **解析**
+ **解析**<br>
  要把插件中的静态BroadcastReceiver当做动态BroadcastReceiver处理，首先要知道插件中到底注册了哪些广播，可以选择手动解析插件的清单文件，也可以选择使用系统的PackageParser来帮助解析。<br>
  PackageParser中有一系列方法用来提取apk中的信息，我们要解析apk的<receiver>的信息，可以使用PackageParser的generateActivityInfo方法。
  
- **注册**
+ **注册**<br>
  当我们解析得到插件中静态注册的BroadcastReceiver的信息后，我们只需要把这些静态广播动态注册一遍就可以了；但是，由于BroadcastReceiver的实现类存在于插件之中，我们需要手动用ClassLoader来加载它。<br>
+ 
+ #### 四 . 代码实现
+ 1 . 将插件test.jar从assets目录复制到/data/user/0/com.liuh.receiver_management/files/下面<br>
+ 
+ 2 . 解析出插件中所有注册的静态广播，然后采用动态广播的方式全部重新注册一遍<br>
+ 
+ 3 . 点击按钮后，我们会发送一个广播，在插件中收到这个广播后，按照事前写好的代码，它会回发一个广播，如果这个流程顺利走完，则表示插件中的静态广播已经成功被注册到AMS中了，即我们完成了静态广播的插件化。<br>
+ 
+ 具体代码实现见项目。
  
  
  

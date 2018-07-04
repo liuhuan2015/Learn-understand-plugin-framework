@@ -2,6 +2,7 @@ package com.liuh.receiver_management;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import java.io.Closeable;
 import java.io.File;
@@ -28,6 +29,7 @@ public class Utils {
         try {
             is = am.open(sourceName);
             File extractFile = context.getFileStreamPath(sourceName);
+            Log.e("-------", extractFile.getAbsolutePath());
             fos = new FileOutputStream(extractFile);
             byte[] buffer = new byte[1024];
             int count = 0;

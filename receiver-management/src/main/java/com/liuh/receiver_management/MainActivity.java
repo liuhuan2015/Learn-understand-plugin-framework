@@ -13,6 +13,11 @@ import android.widget.Toast;
 
 import java.io.File;
 
+/**
+ * 1 . 先把要加载的文件从assets目录复制到/data/user/0/com.liuh.receiver_management/files/下面<br>
+ * 2 . 解析出插件中所有注册的静态广播，然后采用动态广播的方式全部重新注册一遍<br>
+ * 3 . 点击按钮后，我们会发送一个广播，在插件中收到这个广播后，按照事前写好的代码，它会回发一个广播，如果这个流程顺利走完，则表示插件中的静态广播已经成功被注册到AMS中了，即我们完成了静态广播的插件化。
+ */
 public class MainActivity extends AppCompatActivity {
     // 发送广播到插件之后, 插件如果受到, 那么会回传一个ACTION 为这个值的广播;
     static final String ACTION = "com.weishu.upf.demo.app2.PLUGIN_ACTION";
