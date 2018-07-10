@@ -1,1 +1,1 @@
-include ':app', ':dynamic-proxy-hook', ':binder-hook', ':ams-pms-hook', ':intercept-activity', ':classloader-hook', ':contentprovider-management', ':receiver-management'
+include ':app', ':dynamic-proxy-hook', ':binder-hook', ':ams-pms-hook', ':intercept-activity', ':classloader-hook', ':contentprovider-management', ':receiver-management', ':service-management'

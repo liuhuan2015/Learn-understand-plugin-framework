@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/dynamic-proxy-hook" />
             <option value="$PROJECT_DIR$/intercept-activity" />
             <option value="$PROJECT_DIR$/receiver-management" />
+            <option value="$PROJECT_DIR$/service-management" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
