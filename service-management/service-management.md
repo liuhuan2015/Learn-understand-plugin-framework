@@ -62,7 +62,7 @@ Service的创建过程在ActivityThread中，通过handleCreateService方法，�
 
 ##### 1.Service与Activity的异同
 
-**用户交互对于生命周期的影响**
+**用户交互对于生命周期的影响**<br>
 首先，Activity与Service组件最大的不同点在于，Activity组件可以与用户进行交互；这一点意味着用户的行为会对Activity组件产生影响，对我们来说最重要的影响就是Activity组件的生命周期；<br>
 用户点击按钮从界面A跳转到界面B，会引起A和B这两个Activity一系列生命周期的变化。而Service组件则代表后台任务，除了内存不足系统回收之外，它的生命周期完全由我们的代码控制，与用户的交互无关。<br>
 
@@ -72,7 +72,7 @@ Activity组件的生命周期受用户交互影响，而这种变化只有Androi
 那么自然而然，我们可以**手动控制它的生命周期**，就像我们对于BroadcastReceiver的插件化方式一样！Activity组件的插件化无疑是比较复杂的，为了把插件Activity交给系统管理进而拥有完整生命周期，<br>
 我们设计了一个天衣无缝的方案骗过了AMS；既然Service的生命周期可以由我们自己控制，那么我们可以有更简单的方案实现它的插件化。<br>
 
-**Activity的任务栈**
+**Activity的任务栈**<br>
 虽然Activity的插件化技术更复杂，但是这种方案并不能完成Service组件的插件化——复杂的方案并不意味着它能处理更多的问题。<br>
 
 原因在于Activity拥有任务栈的概念，任务栈是Service组件与Activity组件插件化方式分道扬镳的根本原因。<br>
@@ -83,7 +83,7 @@ Activity组件的生命周期受用户交互影响，而这种变化只有Androi
 但是Service组件不一样，理论情况下，可以启动的Service组件是无限的——除了硬件以及内存资源，没有什么限制它的数目；如果采用Activity的插件化方式，就算我们在AndroidMafenist.xml中声明再多的StubService，<br>
 总有不能满足插件中要启动的Service数目的情况出现。也许有童鞋会说，可以用一个StubService对应多个插件Service，这确实能解决部分问题；但是，下面的这个区别让这种设想彻底泡汤。<br>
 
-  Service无法拥有多实例<br>
+**Service无法拥有多实例**<br>
 
 Service组件与Activity组件另外一个不同点在于，对同一个Service调用多次startService并不会启动多个Service实例，而非特定Flag的Activity是可以允许这种情况存在的，因此如果用StubService的方式，<br>
 为了实现Service的这种特性，必须建立一个StubService到插件Service的一个Map，Map的这种一一对应关系使得我们使用一个StubService对应多个插件Service的计划成为天方夜谭。<br>
