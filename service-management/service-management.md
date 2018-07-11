@@ -93,7 +93,51 @@ Service组件与Activity组件另外一个不同点在于，对同一个Service�
 #### 三 . 如何实现Service的插件化？
 上文指出，我们不能套用Activity的方案实现Service组件的插件化，但是可以通过手动控制Service组件的生命周期实现；<br>
 Service的生命周期图如下：<br>
-![Service的生命周期时序图](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/service-management/images/service_life.png)
+
+![Service的生命周期时序图](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/service-management/images/service_life.png)<br>
+
+从图中可以看出，Service的生命周期相当简单：整个生命周期从调用 onCreate() 开始起，到 onDestroy() 返回时结束。<br>
+对于非绑定服务，就是从startService调用到stopService或者stopSelf调用。对于绑定服务，就是bindService调用到unbindService调用。<br>
+
+如果要手动控制Service组件的生命周期，我们只需要模拟出这个过程即可；而实现这一点并不复杂。<br>
+
+1 . 如果以startService的方式启动插件Service，直接回调要启动的Service对象的onStartCommand方法即可；如果用stopService或者stopSelf的方式停止Service，只需要回调对应的Service组件的onDestroy方法。<br>
+
+2 . 如果用bindService方式绑定插件Service，可以调用对应Service对应的onBind方法，获取onBind方法返回的Binder对象，然后通过ServiceConnection对象进行回调统计；unBindService的实现同理。<br>
+
+##### 3.1  完全手动控制
+我们必须在startService,stopService等方法被调用的时候拿到控制权，才能手动去控制Service的生命周期；要达到这一目的非常简单——Hook ActivityManageNative即可。在Activity的插件化方案中我们就通过这种方式接管了startActivity调用。<br>
+
+Hook掉ActivityManageNative之后，可以拦截对于startService以及stopService等方法的调用；拦截之后，我们可以直接对插件Service进行操作：
+
+1 . 拦截到startService之后，如果Service还没有创建就直接创建Service对象(可能需要加载插件)，然后调用这个Service的onCreate，onStartCommond方法；如果Service已经创建，获取到创建的Service对象并执行其onStartCommond方法。<br>
+
+2 . 拦截到stopService之后，获取到对应的Service对象，直接调用这个Service的onDestory方法。<br>
+
+这种方案看起来简单的让人不敢相信，但是很可惜，这么干是不行的。<br>
+
+首先，Service存在的意义在于它作为一个后台任务，拥有相对较高的运行时优先级；除非在内存极其不足威胁到前台Activity的时候，这个组件才会被系统杀死。<br>
+上述这种实现完全把Service当作一个普通的Java对象使用了，因此并没有完全实现Service所具备的能力。<br>
+
+其次，Activity以及Service等组件是可以指定进程的，而让Service运行在某个特定进程的情况非常常见——所谓的远程Service；用上述这种办法压根儿没有办法让某个Service对象运行在一个别的进程。<br>
+Android系统给开发者控制进程的机会太少了，要么在AndroidManifest.xml中通过process属性指定，要么借助Java的Runtime类或者native的fork；这几种方式都无法让我们以一种简单的方式配合上述方案达到目的。<br>
+
+##### 3.2  代理分发技术
+既然我们希望插件的Service具有一定的运行时优先级，那么一个货真价实的Service组件是必不可少的——只有这种被系统认可的真正的Service组件才具有所谓的运行时优先级。<br>
+
+因此，我们可以注册一个真正的Service组件ProxyService，让这个Service承载一个真正的Service组件所具备的能力（进程优先级等）；<br>
+当启动插件的服务比如PluginService的时候，我们统一启动这个ProxyService，当这个ProxyService运行起来之后，再在它的onStartCommand等方法里面进行分发，执行PluginService的onStartCommond等对应的方法；<br>
+我们把这种方案形象地称为「代理分发技术」。<br>
+
+代理分发技术也可以完美解决插件Service可以运行在不同的进程的问题——我们可以在AndroidManifest.xml中注册多个ProxyService，指定它们的process属性，让它们运行在不同的进程；<br>
+当启动的插件Service希望运行在一个新的进程时，我们可以选择某一个合适的ProxyService进行分发。<br>
+也许有童鞋会说，那得注册多少个ProxyService才能满足需求啊？理论上确实存在这问题，但事实上，一个App使用超过10个进程的几乎没有；因此这种方案是可行的。<br>
+
+#### 四 . Service插件化方案的具体实现
+
+
+
+
 
 
 
