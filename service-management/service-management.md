@@ -93,7 +93,7 @@ Service组件与Activity组件另外一个不同点在于，对同一个Service�
 #### 三 . 如何实现Service的插件化？
 上文指出，我们不能套用Activity的方案实现Service组件的插件化，但是可以通过手动控制Service组件的生命周期实现；<br>
 Service的生命周期图如下：<br>
-![https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/service-management/images/service_life.png](Service的生命周期时序图)
+![Service的生命周期时序图](https://github.com/liuhuan2015/Learn-understand-plugin-framework/blob/master/service-management/images/service_life.png)
 
 
 
