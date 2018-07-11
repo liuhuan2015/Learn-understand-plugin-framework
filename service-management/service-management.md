@@ -91,6 +91,10 @@ Service组件与Activity组件另外一个不同点在于，对同一个Service�
 结论：**对于Service组件的插件化，我们不能简单地套用Activity的方案**
 
 #### 三 . 如何实现Service的插件化？
+上文指出，我们不能套用Activity的方案实现Service组件的插件化，但是可以通过手动控制Service组件的生命周期实现；<br>
+Service的生命周期图如下：<br>
+
+
 
 
 
