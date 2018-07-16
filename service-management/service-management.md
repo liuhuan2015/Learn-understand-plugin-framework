@@ -134,6 +134,108 @@ Android系统给开发者控制进程的机会太少了，要么在AndroidManife
 也许有童鞋会说，那得注册多少个ProxyService才能满足需求啊？理论上确实存在这问题，但事实上，一个App使用超过10个进程的几乎没有；因此这种方案是可行的。<br>
 
 #### 四 . Service插件化方案的具体实现
+##### 1 . 注册代理Service
+需要一个货真价实的Service组件来承载进程优先级等功能，因此需要在AndroidManifest.xml中声明一个或者多个（用以支持多进程）这样的Sevice。
+##### 2 . 拦截startService等调用过程
+要手动控制Service组件的声明周期，需要拦截startService,stopService等调用，并把启动插件Service全部重定向为启动ProxyService（保留原始插件Service信息）；<br>
+这个拦截过程需要Hook ActivityManageNative.<br>
+
+在收到startService,stopService之后可以进行具体的操作，对于startService来说，就是直接替换启动的插件Service为ProxyService等待后续处理.<br>
+
+对stopService的处理略有不同但是大同小异.<br>
+##### 3 . 分发Service
+Hook ActivityManageNative之后，所有的插件Service的启动都被重定向到了我们注册的ProxyService，这样可以保证我们的插件Service有一个真正的Service组件作为宿主；<br>
+
+但是要执行特定插件Service的任务，我们必须把这个任务分发到真正要启动的Service上去；以onStart为例，在启动ProxyService之后，会收到ProxyService的onStart回调，<br>
+
+我们可以在这个方法里面把具体的任务交给原始要启动的插件Service组件.<br>
+##### 4 . 加载Service
+我们可以在ProxyService里面把任务转发给真正要启动的插件Service组件，要完成这个过程需要创建一个对应的插件Service对象，比如PluginService；<br>
+
+但是通常情况下插件存在于单独的文件之中，正常的方式是无法创建这个PluginService对象的，宿主程序默认的ClassLoader无法加载插件中对应的这个类；<br>
+
+所以，要创建这个对应的PluginService对象，必须先完成插件的加载过程，让这个插件中的所有类都可以被正常访问;<br>
+
+这种技术在前面讨论过，并给出了「激进方案」和「保守方案」，详见插件加载机制。Droid Plugin中采用的是激进方案。<br>
+##### 5 . 匹配过程
+我们把启动插件中的Service重定向为启动ProxyService，现在ProxyService已经启动，因此必须把控制权交回给原始的PluginService；<br>
+
+在加载插件的时候，我们存储了插件中所有的Service组件的信息，因此，只需要根据Intent里面的Component信息就可以取出对应的PluginService。
+##### 6 . 创建以及分发
+插件被加载之后，我们就需要创建插件Service对应的Java对象了；由于这些类是在运行时动态加载进来的，肯定不能直接使用new关键字——我们需要使用反射机制。<br>
+
+下面的代码创建出的插件Service对象能满足要求吗？<br>
+```java
+    ClassLoader cl = getClassLoader();
+    Service service = cl.loadClass("com.plugin.xxx.PluginService1");
+```
+Service作为Android系统的组件，最重要的特点是它具有Context；所以，直接通过反射创建出来的这个PluginService就是一个壳子——没有Context的Service能干什么？<br>
+
+因此我们需要给将要创建的Service类创建出Conetxt；但是Context应该如何创建呢？我们平时压根儿没有这么干过，Context都是系统给我们创建好的。<br>
+
+既然这样，我们可以参照一下系统是如何创建Service对象的；<br>
+
+系统创建Service对象的过程发生在ActivityThread类的handleCreateService方法中，摘要如下：<br>
+```java
+ try {
+            java.lang.ClassLoader cl = packageInfo.getClassLoader();
+            service = (Service) cl.loadClass(data.info.name).newInstance();
+        } catch (Exception e) {
+            if (!mInstrumentation.onException(service, e)) {
+                throw new RuntimeException(
+                    "Unable to instantiate service " + data.info.name
+                    + ": " + e.toString(), e);
+            }
+        }
+        
+   try {
+             if (localLOGV) Slog.v(TAG, "Creating service " + data.info.name);
+ 
+             ContextImpl context = ContextImpl.createAppContext(this, packageInfo);
+             context.setOuterContext(service);
+ 
+             Application app = packageInfo.makeApplication(false, mInstrumentation);
+             service.attach(context, this, data.info.name, data.token, app,
+                     ActivityManager.getService());
+             service.onCreate();
+             mServices.put(data.token, service);
+             try {
+                 ActivityManager.getService().serviceDoneExecuting(
+                         data.token, SERVICE_DONE_EXECUTING_ANON, 0, 0);
+             } catch (RemoteException e) {
+                 throw e.rethrowFromSystemServer();
+             }
+         } catch (Exception e) {
+             if (!mInstrumentation.onException(service, e)) {
+                 throw new RuntimeException(
+                     "Unable to create service " + data.info.name
+                     + ": " + e.toString(), e);
+             }
+         }
+```
+可以看到，系统也是通过反射创建出了对应的Service对象，然后也创建了对应的Context，并给Service注入了活力。<br>
+
+如果我们模拟系统创建Context这个过程，势必需要进行一系列反射调用，那么我们何不直接反射handleCreateService方法呢？<br>
+
+handleCreateService这个方法并没有把创建出来的Service对象作为返回值返回，而是存放在ActivityThread的成员变量mService之中，这个是小case，我们反射取出来就行。<br>
+
+当我们创建出对应的PluginService，并且拥有至关重要的Context对象时；接下来就可以把消息分发给原始的PluginService组件了，这个分发的过程很简单，直接执行消息对应的回调（onStart，onDestroy等）即可；<br>
+
+至此，算是实现了Service组件的插件化。<br>
+
+#### 五 . 总结
+
+
+
+
+
+
+
+
+
+
+ 
+
 
 
 
